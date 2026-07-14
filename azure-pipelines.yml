@@ -21,21 +21,21 @@ steps:
     displayName: 'Install Terraform'
 
   - script: |
-      cd terraform   # 👈 change into the folder containing your .tf files
+      workingDirectory: terraform   # 👈 change into the folder containing your .tf files
       terraform init -input=false
     displayName: 'Terraform Init'
 
   - script: |
-      cd terraform
+      workingDirectory: terraform
       terraform validate
     displayName: 'Terraform Validate'
 
   - script: |
-      cd terraform
+      workingDirectory: terraform
       terraform plan -out=tfplan -input=false
     displayName: 'Terraform Plan'
 
   - script: |
-      cd terraform
+      workingDirectory: terraform
       terraform apply -auto-approve tfplan
     displayName: 'Terraform Apply'

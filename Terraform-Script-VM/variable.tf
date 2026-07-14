@@ -1,27 +1,26 @@
 variable "resource_group_name" {
-    default = "vm_rg"
+  default = "vm_terraform"
 }
 
 variable "location" {
-    default = "eastus"
+  default = "westus2"
 }
 
 variable "vm_name" {
-    default = "vm_win"
+  default = "vm_win"
 }
 
 variable "vm_size" {
-    default = "Standard_D2s_v3
+  default = "Standard_D2s_v3"
 }
 
 variable "admin_username" {
-    default = "rakesh.jalagam
+  default = "rakesh.jalagam"
 }
 
 variable "admin_password" {
-    description = "Admin password for the virtual machine"
-    type        = string
-    sensitive   = true
-    default     = "Rakesh@9059040620
+  description = "Admin password for the virtual machine"
+  type        = string
+  sensitive   = true
+  default     = "Rakesh@9059040620"
 }
-

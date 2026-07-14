@@ -11,10 +11,8 @@ variables:
   ARM_TENANT_ID: '<tenant-id>'
 
 steps:
-  # Checkout your GitHub repo
   - checkout: self
 
-  # Install Terraform manually
   - script: |
       curl -LO https://releases.hashicorp.com/terraform/1.9.0/terraform_1.9.0_linux_amd64.zip
       unzip terraform_1.9.0_linux_amd64.zip
@@ -22,22 +20,22 @@ steps:
       terraform -version
     displayName: 'Install Terraform'
 
-  # Initialize Terraform
   - script: |
+      cd terraform   # 👈 change into the folder containing your .tf files
       terraform init -input=false
     displayName: 'Terraform Init'
 
-  # Validate Terraform files
   - script: |
+      cd terraform
       terraform validate
     displayName: 'Terraform Validate'
 
-  # Plan Terraform deployment
   - script: |
+      cd terraform
       terraform plan -out=tfplan -input=false
     displayName: 'Terraform Plan'
 
-  # Apply Terraform deployment
   - script: |
+      cd terraform
       terraform apply -auto-approve tfplan
     displayName: 'Terraform Apply'

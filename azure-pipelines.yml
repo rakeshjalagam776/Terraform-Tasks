@@ -1,26 +1,26 @@
 trigger:
-  - main   # pipeline runs when code is pushed to main branch
+  - main
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  # These values come from your Azure DevOps Service Connection / Key Vault
   ARM_SUBSCRIPTION_ID: '70857cdc-9740-4343-8a3c-e51c33db6794'
   ARM_CLIENT_ID: '<service-principal-client-id>'
   ARM_CLIENT_SECRET: '<service-principal-secret>'
   ARM_TENANT_ID: '<tenant-id>'
-  ARM_ACCESS_KEY: '<storage-account-key-if-using-remote-state>'
 
 steps:
-  # Checkout your GitHub repo containing Terraform files
-  - task: Checkout@1
-    displayName: 'Checkout GitHub Repo'
+  # Checkout your GitHub repo
+  - checkout: self
 
-  # Install Terraform
-  - task: TerraformInstaller@0
-    inputs:
-      terraformVersion: '1.9.0'
+  # Install Terraform manually
+  - script: |
+      curl -LO https://releases.hashicorp.com/terraform/1.9.0/terraform_1.9.0_linux_amd64.zip
+      unzip terraform_1.9.0_linux_amd64.zip
+      sudo mv terraform /usr/local/bin/
+      terraform -version
+    displayName: 'Install Terraform'
 
   # Initialize Terraform
   - script: |

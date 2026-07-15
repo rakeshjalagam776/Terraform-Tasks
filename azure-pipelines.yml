@@ -1,20 +1,29 @@
 trigger:
-- main   # runs pipeline when you push to main branch
+- main   # run when code is pushed to main branch
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  TF_WORKING_DIR: '$(Build.SourcesDirectory)/Terraform-Tasks'   # path to your Terraform files
+  TF_WORKING_DIR: '$(Build.SourcesDirectory)/Terraform-Tasks'   # adjust if your .tf files are in a subfolder
 
 steps:
-# Step 1: Install Terraform
-- task: TerraformInstaller@0
+# Step 1: Install Terraform manually
+- task: Bash@3
+  displayName: 'Install Terraform'
   inputs:
-    terraformVersion: '1.7.5'   # pick a stable version
+    targetType: 'inline'
+    script: |
+      sudo apt-get update -y
+      sudo apt-get install -y wget unzip
+      wget https://releases.hashicorp.com/terraform/1.7.5/terraform_1.7.5_linux_amd64.zip
+      unzip terraform_1.7.5_linux_amd64.zip
+      sudo mv terraform /usr/local/bin/
+      terraform -version
 
-# Step 2: Initialize Terraform
+# Step 2: Terraform Init
 - task: AzureCLI@2
+  displayName: 'Terraform Init'
   inputs:
     azureSubscription: 'Terraform'   # name of your ARM service connection
     scriptType: 'bash'
@@ -25,6 +34,7 @@ steps:
 
 # Step 3: Terraform Plan
 - task: AzureCLI@2
+  displayName: 'Terraform Plan'
   inputs:
     azureSubscription: 'Terraform'
     scriptType: 'bash'
@@ -35,6 +45,7 @@ steps:
 
 # Step 4: Terraform Apply
 - task: AzureCLI@2
+  displayName: 'Terraform Apply'
   inputs:
     azureSubscription: 'Terraform'
     scriptType: 'bash'

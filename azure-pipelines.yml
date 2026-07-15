@@ -1,60 +1,44 @@
 trigger:
-- main
+- main   # runs pipeline when you push to main branch
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  serviceConnection: 'Terraform'   # Azure RM service connection name
-  tfWorkingDir: '$(Build.SourcesDirectory)/terraform'
-
-resources:
-  repositories:
-    - repository: https://github.com/rakeshjalagam776/Terraform-Tasks
-      type: github
-      name: rakeshjalagam776/Terraform-Tasks
-      endpoint: rakeshjalagam776
+  TF_WORKING_DIR: '$(Build.SourcesDirectory)/Terraform-Tasks'   # path to your Terraform files
 
 steps:
-- checkout: https://github.com/rakeshjalagam776/Terraform-Tasks
-
-- task: AzureCLI@2
-  displayName: 'Login to Azure'
+# Step 1: Install Terraform
+- task: TerraformInstaller@0
   inputs:
-    azureSubscription: $(serviceConnection)
-    scriptType: bash
-    scriptLocation: inlineScript
+    terraformVersion: '1.7.5'   # pick a stable version
+
+# Step 2: Initialize Terraform
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'Terraform'   # name of your ARM service connection
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
     inlineScript: |
-      echo "Logged in to Azure with service connection"
+      cd $(TF_WORKING_DIR)
+      terraform init
 
-- script: |
-    curl -sLo terraform.zip https://releases.hashicorp.com/terraform/1.7.5/terraform_1.7.5_linux_amd64.zip
-    unzip terraform.zip
-    sudo mv terraform /usr/local/bin/
-    terraform -version
-  displayName: 'Install Terraform'
+# Step 3: Terraform Plan
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'Terraform'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      cd $(TF_WORKING_DIR)
+      terraform plan -out=tfplan
 
-- script: |
-    cd $(tfWorkingDir)
-    terraform init
-  displayName: 'Terraform Init'
-
-- script: |
-    cd $(tfWorkingDir)
-    terraform validate
-  displayName: 'Terraform Validate'
-
-- script: |
-    cd $(tfWorkingDir)
-    terraform plan -out=tfplan
-  displayName: 'Terraform Plan'
-
-- script: |
-    cd $(tfWorkingDir)
-    terraform apply -auto-approve tfplan
-  displayName: 'Terraform Apply'
-
-- script: |
-    cd $(tfWorkingDir)
-    terraform output
-  displayName: 'Show Terraform Outputs'
+# Step 4: Terraform Apply
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'Terraform'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      cd $(TF_WORKING_DIR)
+      terraform apply -auto-approve tfplan

@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  serviceConnection: 'AzureRM'   # replace with your service connection name
+  serviceConnection: 'Terraform'   # replace with your service connection name
   tfWorkingDir: '$(System.DefaultWorkingDirectory)/terraform'
 
 steps:

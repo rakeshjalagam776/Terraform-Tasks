@@ -4,8 +4,16 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+
+resources:
+  repositories:
+    - repository: terraformRepo
+      type: github
+      name: rakeshjalagam776/Terraform-Tasks
+      endpoint: rakeshjalagam776   # ✅ must match the GitHub service connection name
+
 variables:
-  serviceConnection: 'GitHub'   # Azure RM service connection name
+  serviceConnection: 'Terraform'   # ✅ must match the Azure RM service connection name
   tfWorkingDir: '$(System.DefaultWorkingDirectory)/terraform'
 
 steps:

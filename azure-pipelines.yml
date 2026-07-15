@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  TF_WORKING_DIR: '$(Build.SourcesDirectory)/Terraform-Tasks/Terraform-Script-VM/.tf'   # adjust if your .tf files are in a subfolder
+  TF_WORKING_DIR: '$(Build.SourcesDirectory)/https://github.com/rakeshjalagam776/Terraform-Tasks/tree/main/Terraform-Script-VM'   # adjust if your .tf files are in a subfolder
 
 steps:
 # Step 1: Install Terraform manually

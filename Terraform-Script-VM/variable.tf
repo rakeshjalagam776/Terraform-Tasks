@@ -7,7 +7,7 @@ variable "location" {
 }
 
 variable "vm_name" {
-  default = "vm_win"
+  default = "vm_linux"   # ✅ updated name
 }
 
 variable "vm_size" {
@@ -15,12 +15,20 @@ variable "vm_size" {
 }
 
 variable "admin_username" {
-  default = "rakesh.jalagam"
+  default = "rakesh"     # ✅ Linux usernames should be simple (no dots)
 }
 
+# Option 1: Password authentication (not recommended for Linux)
 variable "admin_password" {
-  description = "Admin password for the virtual machine"
+  description = "Admin password for the Linux VM"
   type        = string
   sensitive   = true
-  default     = "Rakesh@9059040620"
+  default     = "Rakesh@9059040620"   # ✅ use a strong password
+}
+
+# Option 2: SSH key authentication (recommended)
+variable "ssh_public_key" {
+  description = "SSH public key for the Linux VM"
+  type        = string
+  default     = file("~/.ssh/id_rsa.pub")
 }

@@ -9,7 +9,7 @@ variables:
   tfWorkingDir: '$(System.DefaultWorkingDirectory)/terraform'
 
 steps:
-- checkout: https://github.com/rakeshjalagam776/Terraform-Tasks/
+- checkout: github.com/rakeshjalagam776/Terraform-Tasks/
   persistCredentials: true
 
 - task: AzureCLI@2

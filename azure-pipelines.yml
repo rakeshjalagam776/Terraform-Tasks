@@ -14,7 +14,7 @@ steps:
 - task: AzureCLI@2
   displayName: 'Login to Azure'
   inputs:
-    azureSubscription: $(serviceConnection)
+    azureSubscription: $(Terraform)
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
@@ -45,7 +45,7 @@ steps:
     provider: 'azurerm'
     command: 'plan'
     workingDirectory: '$(tfWorkingDir)'
-    environmentServiceNameAzureRM: $(serviceConnection)
+    environmentServiceNameAzureRM: $(Terraform)
 
 - task: TerraformTaskV4@4
   displayName: 'Terraform Apply'
@@ -53,5 +53,5 @@ steps:
     provider: 'azurerm'
     command: 'apply'
     workingDirectory: '$(tfWorkingDir)'
-    environmentServiceNameAzureRM: $(serviceConnection)
+    environmentServiceNameAzureRM: $(Terraform)
     args: '-auto-approve'

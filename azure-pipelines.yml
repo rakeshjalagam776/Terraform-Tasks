@@ -1,14 +1,14 @@
 trigger:
-- main   # run when code is pushed to main branch
+- main
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  TF_WORKING_DIR: '$(Build.SourcesDirectory)/Terraform-Tasks'   # adjust if your .tf files are in a subfolder
+  TF_WORKING_DIR: '$(Build.SourcesDirectory)/Terraform-Tasks'
 
 steps:
-# Step 1: Install Terraform manually
+# Install Terraform
 - task: Bash@3
   displayName: 'Install Terraform'
   inputs:
@@ -21,18 +21,18 @@ steps:
       sudo mv terraform /usr/local/bin/
       terraform -version
 
-# Step 2: Terraform Init
+# Terraform Init
 - task: AzureCLI@2
   displayName: 'Terraform Init'
   inputs:
-    azureSubscription: 'Terraform'   # name of your ARM service connection
+    azureSubscription: 'Terraform'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
       cd $(TF_WORKING_DIR)
       terraform init
 
-# Step 3: Terraform Plan
+# Terraform Plan
 - task: AzureCLI@2
   displayName: 'Terraform Plan'
   inputs:
@@ -41,9 +41,9 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: |
       cd $(TF_WORKING_DIR)
-      terraform plan -out=tfplan
+      terraform plan -out=tfplan -var="ssh_public_key=$(ssh_public_key)"
 
-# Step 4: Terraform Apply
+# Terraform Apply
 - task: AzureCLI@2
   displayName: 'Terraform Apply'
   inputs:
@@ -52,4 +52,4 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: |
       cd $(TF_WORKING_DIR)
-      terraform apply -auto-approve tfplan
+      terraform apply -auto-approve tfplan -var="ssh_public_key=$(ssh_public_key)"

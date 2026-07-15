@@ -1,41 +1,57 @@
 trigger:
-  - main
+- main   # or your branch name
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  ARM_SUBSCRIPTION_ID: '70857cdc-9740-4343-8a3c-e51c33db6794'
-  ARM_CLIENT_ID: '<service-principal-client-id>'
-  ARM_CLIENT_SECRET: '<service-principal-secret>'
-  ARM_TENANT_ID: '<tenant-id>'
+  # Azure DevOps Service Connection name
+  serviceConnection: 'Terraform'   # replace with your actual service connection name
+  # Terraform working directory
+  tfWorkingDir: '$(System.DefaultWorkingDirectory)/terraform'
 
 steps:
-  - checkout: self
+- task: AzureCLI@2
+  displayName: 'Login to Azure'
+  inputs:
+    azureSubscription: $(serviceConnection)
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      echo "Logged in to Azure with service connection"
 
-  - script: |
-      curl -LO https://releases.hashicorp.com/terraform/1.9.0/terraform_1.9.0_linux_amd64.zip
-      unzip terraform_1.9.0_linux_amd64.zip
-      sudo mv terraform /usr/local/bin/
-      terraform -version
-    displayName: 'Install Terraform'
+- task: TerraformInstaller@1
+  displayName: 'Install Terraform'
+  inputs:
+    terraformVersion: '1.7.5'   # pick a stable version
 
-  - script: |
-      workingDirectory: terraform   # 👈 change into the folder containing your .tf files
-      terraform init -input=false
-    displayName: 'Terraform Init'
+- task: TerraformTaskV4@4
+  displayName: 'Terraform Init'
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    workingDirectory: '$(tfWorkingDir)'
 
-  - script: |
-      workingDirectory: terraform
-      terraform validate
-    displayName: 'Terraform Validate'
+- task: TerraformTaskV4@4
+  displayName: 'Terraform Validate'
+  inputs:
+    provider: 'azurerm'
+    command: 'validate'
+    workingDirectory: '$(tfWorkingDir)'
 
-  - script: |
-      workingDirectory: terraform
-      terraform plan -out=tfplan -input=false
-    displayName: 'Terraform Plan'
+- task: TerraformTaskV4@4
+  displayName: 'Terraform Plan'
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    workingDirectory: '$(tfWorkingDir)'
+    environmentServiceNameAzureRM: $(serviceConnection)
 
-  - script: |
-      workingDirectory: terraform
-      terraform apply -auto-approve tfplan
-    displayName: 'Terraform Apply'
+- task: TerraformTaskV4@4
+  displayName: 'Terraform Apply'
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    workingDirectory: '$(tfWorkingDir)'
+    environmentServiceNameAzureRM: $(serviceConnection)
+    args: '-auto-approve'

@@ -5,9 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  # Azure DevOps Service Connection name
-  serviceConnection: 'Terraform'   # replace with your actual service connection name
-  # Terraform working directory
+  serviceConnection: 'AzureRM'   # replace with your service connection name
   tfWorkingDir: '$(System.DefaultWorkingDirectory)/terraform'
 
 steps:
@@ -20,38 +18,29 @@ steps:
     inlineScript: |
       echo "Logged in to Azure with service connection"
 
-- task: TerraformInstaller@1
+- script: |
+    curl -sLo terraform.zip https://releases.hashicorp.com/terraform/1.7.5/terraform_1.7.5_linux_amd64.zip
+    unzip terraform.zip
+    sudo mv terraform /usr/local/bin/
+    terraform -version
   displayName: 'Install Terraform'
-  inputs:
-    terraformVersion: '1.7.5'   # pick a stable version
 
-- task: TerraformTaskV4@4
+- script: |
+    cd $(tfWorkingDir)
+    terraform init
   displayName: 'Terraform Init'
-  inputs:
-    provider: 'azurerm'
-    command: 'init'
-    workingDirectory: '$(tfWorkingDir)'
 
-- task: TerraformTaskV4@4
+- script: |
+    cd $(tfWorkingDir)
+    terraform validate
   displayName: 'Terraform Validate'
-  inputs:
-    provider: 'azurerm'
-    command: 'validate'
-    workingDirectory: '$(tfWorkingDir)'
 
-- task: TerraformTaskV4@4
+- script: |
+    cd $(tfWorkingDir)
+    terraform plan -out=tfplan
   displayName: 'Terraform Plan'
-  inputs:
-    provider: 'azurerm'
-    command: 'plan'
-    workingDirectory: '$(tfWorkingDir)'
-    environmentServiceNameAzureRM: $(Terraform)
 
-- task: TerraformTaskV4@4
+- script: |
+    cd $(tfWorkingDir)
+    terraform apply -auto-approve tfplan
   displayName: 'Terraform Apply'
-  inputs:
-    provider: 'azurerm'
-    command: 'apply'
-    workingDirectory: '$(tfWorkingDir)'
-    environmentServiceNameAzureRM: $(Terraform)
-    args: '-auto-approve'
